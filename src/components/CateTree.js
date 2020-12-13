@@ -37,14 +37,22 @@ const treeData = [
 class CateTree extends React.Component{
 
     constructor(prop){
-        super(prop)
+        super(prop);
+
+        setTimeout(()=>{
+            store.dispatch({
+                type: 'ADD',
+                payload: {key:"1",title: 'スポーツ'}
+              });
+        },500)
+
     }
 
     onSelect = (selectedKeys, info) => {
         console.log('selected', selectedKeys, info);
         // console.log(store)
         store.dispatch({
-            type: 'ADD_TODO',
+            type: 'ADD',
             payload: {key:info.node.key,title:info.node.title}
           });
     };
@@ -53,18 +61,18 @@ class CateTree extends React.Component{
         // console.log('onCheck', checkedKeys, info);
     };
 
-
     render(){
         return (
-            <Tree height="800"
-              
-              defaultExpandedKeys={['0']}
-              defaultSelectedKeys={['0-0-0', '0-0-1']}
-              defaultCheckedKeys={['0-0-0', '0-0-1']}
-              onSelect={this.onSelect}
-              onCheck={this.onCheck}
-              treeData={treeData}
-            />
+            <div style={{height:800}}>
+                <Tree height="800"
+                
+                defaultExpandedKeys={['0']}
+                defaultSelectedKeys={['1']}
+                // defaultCheckedKeys={['1']}
+                onSelect={this.onSelect}
+                treeData={treeData}
+                />
+            </div>
           );
     }
 

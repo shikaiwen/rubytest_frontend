@@ -6,6 +6,18 @@ import store from "../redux/store"
 import { useHistory } from "react-router-dom";
 import {Route, BrowserRouter as Router} from "react-router-dom";
 import $ from "jquery"
+import {  notification } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
+
+
+const rowSelection = {
+
+
+    getCheckboxProps: record => ({
+      disabled: record.name === 'Disabled User', // Column configuration not to be checked
+      name: record.name,
+    }),
+  };
 
 class RightMain extends React.Component{
 
@@ -18,55 +30,92 @@ class RightMain extends React.Component{
 
         this.state = {
             cateStr:"",
-            dataSource
+            dataSource,
+            toDeleteRow:''
         }
         
 
         store.subscribe(()=>{
-            let state = store.getState()
-            console.log(`state changed ... ${state}`);
-            console.log(state.cateNow.title)
 
-            let cateStr = state.cateNow.title
-            let cateId = state.cateNow.key;
-            
-            $.get(`http://localhost:3000/api/v1/article?cate=${cateId}`).then((resp)=>{
-                let data = resp.data;
-
-                // console.log(resp.data)
-
-                if(data instanceof Array){
-                    data.forEach(e=>{
-                        e.key = e.id;
-                        e.typeName = cateStr;
-                    })
-                }
-                let dataSource = data;
-                console.log(dataSource)
-                this.setState({cateStr,dataSource});
-
-            })
+            this.queryList()
 
         })
+    }
 
+    queryList = ()=>{
+
+        let state = store.getState()
+        console.log(`state changed ... ${state}`);
+        console.log(state.cateNow.title)
+
+        let cateStr = state.cateNow.title
+        let cateId = state.cateNow.key;
+        
+        $.get(`http://localhost:3000/api/v1/article?cate=${cateId}`).then((resp)=>{
+            let data = resp.data;
+            if(data instanceof Array){
+                data.forEach(e=>{
+                    e.key = e.id;
+                    e.typeName = cateStr;
+                })
+            }
+            let dataSource = data;
+            console.log(dataSource)
+            this.setState({cateStr,dataSource});
+        })
 
     }
 
 
-    addClick(){
-        console.log("addClick...")
-        console.log(this);
+    rowSelectChange = (selectedRowKeys, selectedRows)=>{
 
-        const history = useHistory();
-        history.push("/add");
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        let toDeleteRow = selectedRows[0]
+        this.setState({toDeleteRow})
+
+    }
+
+    doDeleteProduct=()=>{
+
+        let row = this.state.toDeleteRow
+        if(!row){
+            return;
+        }
+
+        let id = row.id;
+        $.ajax({
+            url:`http://localhost:3000/api/v1/article/${id}`,
+            method:"DELETE",
+            data:{id},
+            complete:()=>{
+                console.log("delete over...")
+
+                const openNotification = () => {
+                    notification.open({
+                      message: 'メッセージ',
+                      description:
+                        '商品削除は完了しました。',
+                      icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+                    });
+                  };
+
+                openNotification()
+                this.queryList()
+            }
+        })
+    }
+
+    addClick(){
+        // console.log("addClick...")
+        // console.log(this);
+        // const history = useHistory();
+        // history.push("/add");
         // this.props.history.push("/add");
     }
 
     render(){
 
-        
         let storeState = store.getState();
-          
           const columns = [
 
             {
@@ -99,20 +148,31 @@ class RightMain extends React.Component{
 
         return (
 
-            <div>
+            <div style={{marginLeft:10}}>
+                <Row style={{padding:10}}>
 
-                <Row>
-        <Col>ジャンル:{this.state.cateStr}</Col>
+        <Col span={8}>ジャンル:{this.state.cateStr}</Col>
+        <Col span={10}></Col>
                     <Col>
                         <Route render={({ history}) => (
-
                         <Button type="primary"
                             onClick={() => { history.push('/add') }}>新規</Button>
                         )} />
                     </Col>
+                    <Col span={1}></Col>
+                    <Button type="primary"
+                            onClick={this.doDeleteProduct}>削除</Button>
+                    <Col>
+                    </Col>
                 </Row>
 
-                <Table dataSource={this.state.dataSource} columns={columns} />;
+                <Table 
+        rowSelection={{
+          type: "radio",
+          onChange:this.rowSelectChange,
+        }}
+         dataSource={this.state.dataSource} 
+         columns={columns} />;
 
             </div>
         )

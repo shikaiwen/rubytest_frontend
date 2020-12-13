@@ -59,23 +59,16 @@ class Success extends React.Component{
 function ProductMain(){
 
   return (
-
-
       <Content style={{ padding: '0 50px' }}>
         <div className="site-layout-content">
         <Layout>
-          <Row>
-            <Col span={3}>
-              <CateTree/>
-  
+          <Row style={{marginTop:20}}>
+            <Col   span={3}>
+              <CateTree />
             </Col>
             <Col span={15}>
               
-              <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
-            </Breadcrumb>
+
             <div>
   
               <RightMain/>

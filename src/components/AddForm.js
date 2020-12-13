@@ -9,6 +9,9 @@ import { Form, Input, Checkbox } from 'antd';
 import { Button, DatePicker, version } from "antd";
 import $ from "jquery"
 import {Route, BrowserRouter as Router} from "react-router-dom";
+
+const { TextArea } = Input;
+
 const { Header, Content, Footer ,Sider} = Layout;
 
 
@@ -39,13 +42,15 @@ class AddForm extends React.Component{
 
       let cateNow = storeState.cateNow;
       let t = cateNow? cateNow.key : "1";
+      let cateName = cateNow?cateNow.title:"";
 
       this.state = {
           cate:t,
-          no:'A001',
-        name:'test',
-        price:'100',
-        remarks:'コスパ抜群です'
+          cateName,
+          no:'',
+        name:'',
+        price:'',
+        remarks:''
       }
 
     //   const form = Form.useForm();
@@ -102,8 +107,15 @@ class AddForm extends React.Component{
       return (
         <Content>
 
+
+            <Row justify="center" style={{ 'paddingTop': '50px',paddingBottom:10}}>
+                <Col span={12} >
+      <label>ジャンル:{this.state.cateName}</label>
+                </Col>
+            </Row>
+
             <Row justify="center">
-                <Col span={12} style={{ 'paddingTop': '50px' }}>
+                <Col span={12} >
                 <label>商品番号</label>
                 {/* <Input onChange={this.setState({name:value})}/> */}
                 <Input name="no" type="text" value={this.state.no}  onChange={this.changeValue}></Input>
@@ -124,22 +136,25 @@ class AddForm extends React.Component{
             <Row justify="center">
                 <Col span={12} >
                 <label>説明</label>
-                <Input name="remarks" type="remarks" value={this.state.remarks} onChange={this.changeValue}/>
+                <TextArea rows={3} name="remarks" type="remarks" value={this.state.remarks} onChange={this.changeValue}/>
                 </Col>
             </Row>
 
-            <Row justify="center">
+            <Row justify="center" style={{padding:20}}>
+                <Col span={12}></Col>
                 <Col span={12} >
                     <Button type="primary" onClick={this.submitClick}>登録</Button>
                 </Col>
                 <Col span={12} >
 
                     {/* <Button type="primary"  onClick={this.jumpToResult}>Jump</Button> */}
-
+                    <div style={{visibility:"hidden"}}>
                     <Route render={({ history}) => (
-                    <Button ref={this.jumpBtnRef} type="primary"
+                    
+                    <Button ref={this.jumpBtnRef} type="primary" 
                         onClick={() => { history.push('/success') }}>jump</Button>
                     )} />
+                    </div>
 
                 </Col>
 
